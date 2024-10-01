@@ -25,32 +25,33 @@ public class GuavaCacheProvider extends AbstractCacheProvider<Cache<String, Obje
     }
 
     @Override
-    public void put(Cached cache, String key, Object value) {
-        getCache(cache).put(key, value);
+    public void put(Cache<String, Object> cache, String key, Object value) {
+        cache.put(key, value);
     }
 
     @Override
-    public Object get(Cached cache, String key) {
-        return getCache(cache).getIfPresent(key);
+    public Object get(Cache<String, Object> cache, String key) {
+        return cache.getIfPresent(key);
     }
 
     @Override
-    public void remove(Cached cache, String key) {
-        getCache(cache).invalidate(key);
+    public void remove(Cache<String, Object> cache, String key) {
+        cache.invalidate(key);
     }
 
     @Override
-    public void clear(Cached cache) {
-        getCache(cache).invalidateAll();
+    public void clear(Cache<String, Object> cache) {
+        cache.invalidateAll();
     }
 
     @Override
-    public boolean containsKey(Cached cache, String key) {
-        return getCache(cache).getIfPresent(key) != null;
+    public boolean containsKey(Cache<String, Object> cache, String key) {
+        return cache.getIfPresent(key) != null;
     }
 
     @Override
-    public long size(Cached cache) {
-        return getCache(cache).size();
+    public long size(Cache<String, Object> cache) {
+        return cache.size();
     }
+
 }

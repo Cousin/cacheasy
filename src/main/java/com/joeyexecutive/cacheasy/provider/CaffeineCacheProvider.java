@@ -25,33 +25,33 @@ public class CaffeineCacheProvider extends AbstractCacheProvider<Cache<String, O
     }
 
     @Override
-    public void put(Cached cached, String key, Object value) {
-        getCache(cached).put(key, value);
+    public void put(Cache<String, Object> cache, String key, Object value) {
+        cache.put(key, value);
     }
 
     @Override
-    public Object get(Cached cached, String key) {
-        return getCache(cached).getIfPresent(key);
+    public Object get(Cache<String, Object> cache, String key) {
+        return cache.getIfPresent(key);
     }
 
     @Override
-    public void remove(Cached cached, String key) {
-        getCache(cached).invalidate(key);
+    public void remove(Cache<String, Object> cache, String key) {
+        cache.invalidate(key);
     }
 
     @Override
-    public void clear(Cached cached) {
-        getCache(cached).invalidateAll();
+    public void clear(Cache<String, Object> cache) {
+        cache.invalidateAll();
     }
 
     @Override
-    public boolean containsKey(Cached cached, String key) {
-        return getCache(cached).getIfPresent(key) != null;
+    public boolean containsKey(Cache<String, Object> cache, String key) {
+        return cache.getIfPresent(key) != null;
     }
 
     @Override
-    public long size(Cached cached) {
-        return getCache(cached).estimatedSize();
+    public long size(Cache<String, Object> cache) {
+        return cache.estimatedSize();
     }
 
 }

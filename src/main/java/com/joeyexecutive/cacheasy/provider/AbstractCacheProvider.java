@@ -17,24 +17,24 @@ public abstract class AbstractCacheProvider<C> {
 
     public abstract C createCache(Cached cached);
 
-    public abstract void put(Cached cached, String key, Object value);
+    public abstract void put(C cache, String key, Object value);
 
-    public abstract Object get(Cached cached, String key);
+    public abstract Object get(C cache, String key);
 
-    public abstract void remove(Cached cached, String key);
+    public abstract void remove(C cache, String key);
 
-    public abstract void clear(Cached cached);
+    public abstract void clear(C cache);
 
-    public abstract boolean containsKey(Cached cached, String key);
+    public abstract boolean containsKey(C cache, String key);
 
-    public abstract long size(Cached cached);
+    public abstract long size(C cache);
 
     public void clear() {
         cachedMap.clear();
     }
 
-    public C getCache(Cached cachedd) {
-        return cachedMap.computeIfAbsent(cachedd, this::createCache);
+    public final C getCache(Cached cached) {
+        return cachedMap.computeIfAbsent(cached, this::createCache);
     }
 
 }
