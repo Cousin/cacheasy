@@ -1,1 +1,14 @@
+pluginManagement {
+    repositories {
+        gradlePluginPortal()
+    }
+    // Declared once here so both the library and the example apply the same version
+    // without putting the plugin on the build classpath twice.
+    plugins {
+        id 'io.freefair.aspectj.post-compile-weaving' version '9.5.0'
+    }
+}
+
 rootProject.name = 'cacheasy'
+
+include 'example'

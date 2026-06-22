@@ -1,7 +1,10 @@
 plugins {
     id 'java-library'
-    // Weaves the @Cached aspect into compiled bytecode at build time.
-    id 'io.freefair.aspectj.post-compile-weaving' version '9.5.0'
+    // Runs ajc over the library so CacheAspect becomes a real binary aspect (this is what
+    // generates the aspectOf() accessor that woven consumer code calls). The library has no
+    // @Cached methods of its own, so you'll see a harmless 'adviceDidNotMatch' note.
+    // Plugin version is centralized in settings.gradle (pluginManagement).
+    id 'io.freefair.aspectj.post-compile-weaving'
 }
 
 group = 'com.joeyexecutive'
@@ -22,7 +25,7 @@ dependencies {
     compileOnly 'org.projectlombok:lombok:1.18.22'
     annotationProcessor 'org.projectlombok:lombok:1.18.22'
 
-    // AspectJ runtime — the woven bytecode and the aspect itself depend on it
+    // AspectJ runtime — CacheAspect is written against it, and consumers' woven bytecode needs it
     implementation 'org.aspectj:aspectjrt:1.9.25'
 
     // Cache backends — provided at compile time; consumers supply their own at runtime
@@ -38,6 +41,16 @@ dependencies {
 
 tasks.withType(JavaCompile).configureEach {
     options.encoding = 'UTF-8'
+}
+
+// The library compiles an aspect but has no @Cached methods of its own to weave, so ajc would
+// emit a noisy (and, for a caching library, misleading) 'adviceDidNotMatch' note. Silence it.
+tasks.named('compileJava') {
+    ajc {
+        options {
+            compilerArgs.add('-Xlint:adviceDidNotMatch=ignore')
+        }
+    }
 }
 
 test {

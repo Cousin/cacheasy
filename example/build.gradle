@@ -1,0 +1,44 @@
+plugins {
+    id 'application'
+    // Weaves Cacheasy's aspect into THIS module's @Cached methods at build time.
+    id 'io.freefair.aspectj.post-compile-weaving'
+}
+
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(17)
+    }
+}
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    // Consume Cacheasy as a Gradle library (project dependency).
+    implementation project(':')
+
+    // Put Cacheasy's compiled aspect on the weaving aspectpath, so the weaver applies
+    // CacheAspect to the @Cached methods declared in THIS module.
+    aspect project(':')
+
+    // AspectJ runtime — required by the woven bytecode.
+    implementation 'org.aspectj:aspectjrt:1.9.25'
+
+    // A cache backend. The library declares these as compileOnly, so the consumer
+    // (this example) picks and provides one.
+    implementation 'com.github.ben-manes.caffeine:caffeine:3.0.0'
+
+    // Tests verify that this module's @Cached methods were actually woven.
+    testImplementation platform('org.junit:junit-bom:5.10.2')
+    testImplementation 'org.junit.jupiter:junit-jupiter'
+    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+}
+
+application {
+    mainClass = 'com.example.app.Main'
+}
+
+test {
+    useJUnitPlatform()
+}
