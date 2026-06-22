@@ -1,0 +1,33 @@
+plugins {
+    id 'java-library'
+}
+
+group = 'com.joeyexecutive'
+version = '1.0-SNAPSHOT'
+
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(17)
+    }
+}
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    // Lombok (compile-time only, with its annotation processor)
+    compileOnly 'org.projectlombok:lombok:1.18.22'
+    annotationProcessor 'org.projectlombok:lombok:1.18.22'
+
+    // Cache backends — provided at compile time; consumers supply their own at runtime
+    compileOnly 'com.github.ben-manes.caffeine:caffeine:3.0.0'
+    compileOnly 'com.google.guava:guava:31.0.1-jre'
+
+    // Source generation for the annotation processor
+    implementation 'com.squareup:javapoet:1.13.0'
+}
+
+tasks.withType(JavaCompile).configureEach {
+    options.encoding = 'UTF-8'
+}
