@@ -28,6 +28,13 @@ public class Cacheasy {
         register("redis.clients.jedis.Jedis", "RedisCacheProvider");
     }
 
+    /**
+     * Returns the provider registered for the given backend type (the class named in
+     * {@code @Cached(cacheProvider = ...)}).
+     *
+     * @throws IllegalStateException if no provider is registered — typically because the backend
+     *                               is not on the classpath, or it needs manual registration.
+     */
     @SuppressWarnings("unchecked")
     public static <C> AbstractCacheProvider<C> getCacheProvider(Class<C> cacheProvider) {
         AbstractCacheProvider<C> provider = (AbstractCacheProvider<C>) cacheProviders.get(cacheProvider);
@@ -38,6 +45,11 @@ public class Cacheasy {
         return provider;
     }
 
+    /**
+     * Registers (or replaces) the provider for a backend type. Use this for custom providers or to
+     * supply a configured built-in — for example a Redis provider pointing at a specific host:
+     * {@code Cacheasy.registerCacheProvider(Jedis.class, new RedisCacheProvider("cache.internal", 6379))}.
+     */
     public static void registerCacheProvider(Class<?> cacheProvider, AbstractCacheProvider<?> provider) {
         cacheProviders.put(cacheProvider, provider);
     }

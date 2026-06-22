@@ -5,6 +5,11 @@ import com.github.benmanes.caffeine.cache.Caffeine;
 import com.joeyexecutive.cacheasy.annotation.CacheExpiryType;
 import com.joeyexecutive.cacheasy.annotation.Cached;
 
+/**
+ * <a href="https://github.com/ben-manes/caffeine">Caffeine</a> backend — a high-performance,
+ * near-optimal local cache. Maps Cacheasy's write/access expiry onto Caffeine's
+ * {@code expireAfterWrite}/{@code expireAfterAccess}.
+ */
 public class CaffeineCacheProvider extends AbstractCacheProvider<Cache<String, Object>> {
 
     public CaffeineCacheProvider() {
@@ -46,6 +51,8 @@ public class CaffeineCacheProvider extends AbstractCacheProvider<Cache<String, O
 
     @Override
     public long size(Cache<String, Object> cache) {
+        // Caffeine applies writes asynchronously, so this is an estimate (hence not unit-tested
+        // for an exact value in the provider contract test).
         return cache.estimatedSize();
     }
 

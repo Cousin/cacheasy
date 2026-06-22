@@ -5,6 +5,10 @@ import com.google.common.cache.CacheBuilder;
 import com.joeyexecutive.cacheasy.annotation.CacheExpiryType;
 import com.joeyexecutive.cacheasy.annotation.Cached;
 
+/**
+ * <a href="https://github.com/google/guava">Guava</a> backend. Maps Cacheasy's write/access expiry
+ * onto Guava's {@code expireAfterWrite}/{@code expireAfterAccess}.
+ */
 public class GuavaCacheProvider extends AbstractCacheProvider<Cache<String, Object>> {
 
     public GuavaCacheProvider() {
