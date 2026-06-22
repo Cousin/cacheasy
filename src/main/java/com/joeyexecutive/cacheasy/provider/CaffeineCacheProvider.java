@@ -45,11 +45,6 @@ public class CaffeineCacheProvider extends AbstractCacheProvider<Cache<String, O
     }
 
     @Override
-    public boolean containsKey(Cache<String, Object> cache, String key) {
-        return cache.getIfPresent(key) != null;
-    }
-
-    @Override
     public long size(Cache<String, Object> cache) {
         return cache.estimatedSize();
     }

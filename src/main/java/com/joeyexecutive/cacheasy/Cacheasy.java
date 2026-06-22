@@ -1,12 +1,9 @@
 package com.joeyexecutive.cacheasy;
 
 import com.joeyexecutive.cacheasy.provider.AbstractCacheProvider;
-import com.joeyexecutive.cacheasy.provider.CaffeineCacheProvider;
-import com.joeyexecutive.cacheasy.provider.GuavaCacheProvider;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.function.Supplier;
 
 /**
  * Registry mapping a cache-backend type (e.g. Caffeine's or Guava's {@code Cache})
@@ -17,11 +14,18 @@ public class Cacheasy {
 
     private static final Map<Class<?>, AbstractCacheProvider<?>> cacheProviders = new ConcurrentHashMap<>();
 
+    private static final String PROVIDER_PACKAGE = "com.joeyexecutive.cacheasy.provider.";
+
     static {
-        // Register the built-in backends, but only the ones actually on the classpath.
-        // Consumers typically depend on one of these, not both.
-        register("com.github.benmanes.caffeine.cache.Cache", CaffeineCacheProvider::new);
-        register("com.google.common.cache.Cache", GuavaCacheProvider::new);
+        // Register the built-in backends, but only the ones actually on the classpath —
+        // consumers typically depend on just one. ConcurrentHashMap is always available (JDK),
+        // so it acts as the zero-dependency default. The first argument (the class a consumer
+        // names in @Cached(cacheProvider = ...)) is the map key.
+        register("java.util.concurrent.ConcurrentHashMap", "ConcurrentMapCacheProvider");
+        register("com.github.benmanes.caffeine.cache.Cache", "CaffeineCacheProvider");
+        register("com.google.common.cache.Cache", "GuavaCacheProvider");
+        register("org.ehcache.Cache", "EhcacheCacheProvider");
+        register("redis.clients.jedis.Jedis", "RedisCacheProvider");
     }
 
     @SuppressWarnings("unchecked")
@@ -39,15 +43,21 @@ public class Cacheasy {
     }
 
     /**
-     * Registers a built-in provider only if its backing cache class can be loaded, so that a
-     * consumer who pulls in just one backend doesn't hit a {@link NoClassDefFoundError} for the other.
+     * Registers a built-in provider only if its backing cache class is present. The provider is
+     * instantiated reflectively (by simple class name) so that merely loading {@code Cacheasy}
+     * never references a provider class directly — otherwise the JVM would try to load that
+     * provider's backend types, defeating the point for consumers who pulled in just one backend.
      */
-    private static void register(String cacheClassName, Supplier<AbstractCacheProvider<?>> providerFactory) {
+    private static void register(String cacheClassName, String providerSimpleName) {
         try {
             Class<?> cacheClass = Class.forName(cacheClassName);
-            cacheProviders.put(cacheClass, providerFactory.get());
-        } catch (ClassNotFoundException | NoClassDefFoundError ignored) {
-            // Backend not present on the classpath — nothing to register.
+            AbstractCacheProvider<?> provider = (AbstractCacheProvider<?>) Class
+                    .forName(PROVIDER_PACKAGE + providerSimpleName)
+                    .getDeclaredConstructor()
+                    .newInstance();
+            cacheProviders.put(cacheClass, provider);
+        } catch (ReflectiveOperationException | NoClassDefFoundError ignored) {
+            // Backend (or its provider) not loadable on this classpath — nothing to register.
         }
     }
 

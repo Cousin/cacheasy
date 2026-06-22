@@ -4,8 +4,8 @@ import com.joeyexecutive.cacheasy.annotation.Cached;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
-import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 @Getter
 @RequiredArgsConstructor
@@ -13,7 +13,8 @@ public abstract class AbstractCacheProvider<C> {
 
     private final String name;
 
-    private final Map<Cached, C> cachedMap = new HashMap<>();
+    // Populated lazily from caller threads (via the aspect), so it must be concurrent.
+    private final Map<Cached, C> cachedMap = new ConcurrentHashMap<>();
 
     public abstract C createCache(Cached cached);
 
@@ -25,7 +26,13 @@ public abstract class AbstractCacheProvider<C> {
 
     public abstract void clear(C cache);
 
-    public abstract boolean containsKey(C cache, String key);
+    /**
+     * Default membership check: present iff a non-expired value is cached. Backends with a
+     * cheaper or more precise native check may override.
+     */
+    public boolean containsKey(C cache, String key) {
+        return get(cache, key) != null;
+    }
 
     public abstract long size(C cache);
 

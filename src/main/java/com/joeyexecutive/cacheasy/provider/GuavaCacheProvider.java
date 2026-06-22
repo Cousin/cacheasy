@@ -12,13 +12,13 @@ public class GuavaCacheProvider extends AbstractCacheProvider<Cache<String, Obje
     }
 
     @Override
-    public Cache<String, Object> createCache(Cached ms) {
+    public Cache<String, Object> createCache(Cached cached) {
         CacheBuilder<Object, Object> cacheBuilder = CacheBuilder.newBuilder();
 
-        if (ms.expiryType() == CacheExpiryType.EXPIRES_AFTER_ACCESS) {
-            cacheBuilder.expireAfterAccess(ms.expiresAfter(), ms.expiresTimeUnit());
+        if (cached.expiryType() == CacheExpiryType.EXPIRES_AFTER_ACCESS) {
+            cacheBuilder.expireAfterAccess(cached.expiresAfter(), cached.expiresTimeUnit());
         } else {
-            cacheBuilder.expireAfterWrite(ms.expiresAfter(), ms.expiresTimeUnit());
+            cacheBuilder.expireAfterWrite(cached.expiresAfter(), cached.expiresTimeUnit());
         }
 
         return cacheBuilder.build();
@@ -42,11 +42,6 @@ public class GuavaCacheProvider extends AbstractCacheProvider<Cache<String, Obje
     @Override
     public void clear(Cache<String, Object> cache) {
         cache.invalidateAll();
-    }
-
-    @Override
-    public boolean containsKey(Cache<String, Object> cache, String key) {
-        return cache.getIfPresent(key) != null;
     }
 
     @Override

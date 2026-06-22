@@ -31,9 +31,14 @@ dependencies {
     // Cache backends — provided at compile time; consumers supply their own at runtime
     compileOnly 'com.github.ben-manes.caffeine:caffeine:3.0.0'
     compileOnly 'com.google.guava:guava:31.0.1-jre'
+    compileOnly 'org.ehcache:ehcache:3.10.8'
+    compileOnly 'redis.clients:jedis:5.2.0'
 
-    // Tests run the woven example, so they need a real backend on the runtime classpath
+    // Backends exercised by the provider contract tests (Redis needs a live server, so it's
+    // only compile-checked, not unit-tested here).
     testImplementation 'com.github.ben-manes.caffeine:caffeine:3.0.0'
+    testImplementation 'com.google.guava:guava:31.0.1-jre'
+    testImplementation 'org.ehcache:ehcache:3.10.8'
     testImplementation platform('org.junit:junit-bom:5.10.2')
     testImplementation 'org.junit.jupiter:junit-jupiter'
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
